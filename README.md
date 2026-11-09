@@ -6,77 +6,101 @@ OOP II Final Project — Bank Account Manager in C++
 
 ```mermaid
 classDiagram
+    direction TB
+
+    class Bank {
+        -string bankName
+        -string phoneNumber
+        -string email
+        -string address
+        -vector~unique_ptr~Customer~~ customers
+        +Bank(string name, string phone, string email, string address)
+        +addCustomer(string id, string name, string phone, string email) void
+        +findCustomer(string customerId) Customer*
+        +openAccount(string customerId, unique_ptr~Account~ account) void
+        +closeAccount(string accountNumber) void
+        +findAccount(string accountNumber) Account*
+        +deposit(string accountNumber, double amount) void
+        +withdraw(string accountNumber, double amount) void
+        +saveData(string filePath) void
+        +loadData(string filePath) void
+        +run() void
+    }
+
+    class Customer {
+        -string customerId
+        -string fullName
+        -string phoneNumber
+        -string email
+        -vector~unique_ptr~Account~~ accounts
+        +Customer(string id, string name, string phone, string email)
+        +addAccount(unique_ptr~Account~ account) void
+        +removeAccount(string accountNumber) void
+        +findAccount(string accountNumber) Account*
+        +listAccounts() void
+        +getTotalBalance() double
+    }
+
     class Account {
         <<abstract>>
         -string accountNumber
-        -string ownerName
-        -double balance
-        +Account(number, owner, initialBalance)
-        +deposit(amount) void
-        +withdraw(amount) void
-        +display() void
-        +getType() string
+        #double balance
+        +Account(string number, double initialBalance)
+        +virtual ~Account()
+        +deposit(double amount) void
+        +withdraw(double amount)* void
         +getBalance() double
         +getAccountNumber() string
+        +getType() string*
+        +display() void*
     }
 
     class SavingsAccount {
         -double interestRate
         -double minimumBalance
-        +SavingsAccount(number, owner, balance, rate, min)
-        +withdraw(amount) void
+        +SavingsAccount(string number, double balance, double rate, double minimumBalance)
+        +withdraw(double amount) void
         +applyInterest() void
-        +display() void
         +getType() string
+        +display() void
     }
 
     class CheckingAccount {
         -double overdraftLimit
         -double transactionFee
-        +CheckingAccount(number, owner, balance, limit, fee)
-        +withdraw(amount) void
-        +display() void
+        +CheckingAccount(string number, double balance, double limit, double fee)
+        +withdraw(double amount) void
         +getType() string
+        +display() void
     }
 
-    class Customer {
-        -string customerId
-        -string name
-        -string pin
-        -vector~Account*~ accounts
-        +Customer(id, name, pin)
-        +verifyPin(entered) bool
-        +addAccount(Account* a) void
-        +removeAccount(number) void
-        +findAccount(number) Account*
-        +listAccounts() void
-        +getTotalBalance() double
+    class BankingException {
+        +BankingException(string message)
+    }
+    class InvalidAmountException {
+        +InvalidAmountException(string message)
+    }
+    class InsufficientFundsException {
+        +InsufficientFundsException(string message)
+    }
+    class AccountNotFoundException {
+        +AccountNotFoundException(string message)
+    }
+    class std_runtime_error {
+        <<C++ standard library>>
     }
 
-    class Bank {
-        -vector~Customer~ customers
-        +run() void
-        +signup(name, id, pin) void
-        +login(id, pin) Customer*
-        +openAccount() void
-        +closeAccount() void
-        +deposit() void
-        +withdraw() void
-        +loadData() void
-        +saveData() void
-    }
-
-    class InsufficientFundsException
-    class InvalidAmountException
-    class AccountNotFoundException
-    class AuthenticationException
-
-    Account <|-- SavingsAccount : inherits
-    Account <|-- CheckingAccount : inherits
+    Bank "1" *-- "0..*" Customer : manages
     Customer "1" *-- "0..*" Account : owns
-    Bank "1" *-- "0..*" Customer : owns
-    Account ..> InsufficientFundsException
-    Account ..> InvalidAmountException
-    Account ..> AccountNotFoundException
-    Bank ..> AuthenticationException
+    Account <|-- SavingsAccount
+    Account <|-- CheckingAccount
+
+    std_runtime_error <|-- BankingException
+    BankingException <|-- InvalidAmountException
+    BankingException <|-- InsufficientFundsException
+    BankingException <|-- AccountNotFoundException
+
+    Account ..> InvalidAmountException : may throw
+    Account ..> InsufficientFundsException : may throw
+    Bank ..> AccountNotFoundException : may throw
 ```
