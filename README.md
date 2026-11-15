@@ -13,11 +13,11 @@ classDiagram
         -string phoneNumber
         -string email
         -string address
-        -vector~unique_ptr~Customer~~ customers
+        -vector~Customer*~ customers
         +Bank(string name, string phone, string email, string address)
         +addCustomer(string id, string name, string phone, string email) void
         +findCustomer(string customerId) Customer*
-        +openAccount(string customerId, unique_ptr~Account~ account) void
+        +openAccount(string customerId, Account* account) void
         +closeAccount(string accountNumber) void
         +findAccount(string accountNumber) Account*
         +deposit(string accountNumber, double amount) void
@@ -32,9 +32,9 @@ classDiagram
         -string fullName
         -string phoneNumber
         -string email
-        -vector~unique_ptr~Account~~ accounts
+        -vector~Account*~ accounts
         +Customer(string id, string name, string phone, string email)
-        +addAccount(unique_ptr~Account~ account) void
+        +addAccount(Account* account) void
         +removeAccount(string accountNumber) void
         +findAccount(string accountNumber) Account*
         +listAccounts() void
