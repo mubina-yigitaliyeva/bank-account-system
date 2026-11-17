@@ -13,15 +13,27 @@ classDiagram
         -string phoneNumber
         -string email
         -string address
+        -int nextCustomerId
+        -long nextAccountNumber
+        -double defaultInterestRate
+        -double defaultTransactionFee
         -vector~Customer*~ customers
+        -string generateCustomerId()
+        -string generateAccountNumber()
         +Bank(string name, string phone, string email, string address)
-        +addCustomer(string id, string name, string phone, string email) void
+        +addCustomer(string name, string phone, string email, string password) string
         +findCustomer(string customerId) Customer*
+        +loginCustomer(string emailOrPhone, string password) Customer*
+        +openSavingsAccount(string customerId, double initialBalance, double minimum) string
+        +openCheckingAccount(string customerId, double initialBalance, double limit) string
         +openAccount(string customerId, Account* account) void
         +closeAccount(string accountNumber) void
         +findAccount(string accountNumber) Account*
         +deposit(string accountNumber, double amount) void
         +withdraw(string accountNumber, double amount) void
+        +viewAllCustomers() void
+        +updateAllInterestRates(double newRate) void
+        +updateAllTransactionFees(double newFee) void
         +saveData(string filePath) void
         +loadData(string filePath) void
         +run() void
@@ -32,13 +44,16 @@ classDiagram
         -string fullName
         -string phoneNumber
         -string email
+        -string password
         -vector~Account*~ accounts
-        +Customer(string id, string name, string phone, string email)
+        +Customer(string id, string name, string phone, string email, string password)
         +addAccount(Account* account) void
         +removeAccount(string accountNumber) void
         +findAccount(string accountNumber) Account*
         +listAccounts() void
         +getTotalBalance() double
+        +getPassword() string
+        +verifyPassword(string pwd) bool
     }
 
     class Account {
@@ -63,6 +78,7 @@ classDiagram
         +applyInterest() void
         +getType() string
         +display() void
+        +setInterestRate(double rate) void
     }
 
     class CheckingAccount {
@@ -72,6 +88,7 @@ classDiagram
         +withdraw(double amount) void
         +getType() string
         +display() void
+        +setTransactionFee(double fee) void
     }
 
     class BankingException {
