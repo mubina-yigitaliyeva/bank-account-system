@@ -101,8 +101,8 @@ classDiagram
         +getBankId() string
     }
     class FileStorage {
-        +save(system, filePath)$ void
-        +load(system, filePath)$ void
+        +save(system)$ void
+        +load(system)$ void
     }
     class runtime_error["std::runtime_error"]
     class BankingException
