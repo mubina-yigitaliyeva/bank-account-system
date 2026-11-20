@@ -104,6 +104,7 @@ classDiagram
         +save(system, filePath)$ void
         +load(system, filePath)$ void
     }
+    class std::runtime_error
     class BankingException
     class InvalidAmountException
     class InsufficientFundsException
@@ -119,29 +120,17 @@ classDiagram
     BankStaff "0..*" --> "1" Bank : works at
     Account <|-- SavingsAccount
     Account <|-- CheckingAccount
-
-    %% Exception inheritance
+    BankingException <|-- std::runtime_error
     BankingException <|-- InvalidAmountException
     BankingException <|-- InsufficientFundsException
     BankingException <|-- AccountNotFoundException
-
-    %% Exception dependencies (may throw)
-    BankSystem ..> BankingException : throws
-    Bank ..> BankingException : throws
-    Customer ..> BankingException : throws
-    FileStorage ..> BankingException : throws
-    Account ..> InvalidAmountException : throws
-    SavingsAccount ..> InvalidAmountException : throws
-    SavingsAccount ..> InsufficientFundsException : throws
-    CheckingAccount ..> InvalidAmountException : throws
-    CheckingAccount ..> InsufficientFundsException : throws
-    Customer ..> AccountNotFoundException : throws
-    Bank ..> AccountNotFoundException : throws
+    FileStorage ..> BankSystem : saves / loads
 
     %% Changes to interest rates trigger applyInterest() inside Bank.
     %% Admin is one built-in read-only supervisor; bank staff set bank-specific rates.
     %% FileStorage uses banks.txt, customers.txt, accounts.txt, admins.txt, bank_staff.txt.
+
     %% Admin menu can approve/reject PENDING banks or deactivate APPROVED banks.
-    %% Bank status is persisted by FileStorage in banks.txt.
+    %% The Bank status is persisted by FileStorage in banks.txt.
 
 ```
