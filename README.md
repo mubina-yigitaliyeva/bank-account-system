@@ -119,16 +119,29 @@ classDiagram
     BankStaff "0..*" --> "1" Bank : works at
     Account <|-- SavingsAccount
     Account <|-- CheckingAccount
+
+    %% Exception inheritance
     BankingException <|-- InvalidAmountException
     BankingException <|-- InsufficientFundsException
     BankingException <|-- AccountNotFoundException
-    FileStorage ..> BankSystem : saves / loads
+
+    %% Exception dependencies (may throw)
+    BankSystem ..> BankingException : throws
+    Bank ..> BankingException : throws
+    Customer ..> BankingException : throws
+    FileStorage ..> BankingException : throws
+    Account ..> InvalidAmountException : throws
+    SavingsAccount ..> InvalidAmountException : throws
+    SavingsAccount ..> InsufficientFundsException : throws
+    CheckingAccount ..> InvalidAmountException : throws
+    CheckingAccount ..> InsufficientFundsException : throws
+    Customer ..> AccountNotFoundException : throws
+    Bank ..> AccountNotFoundException : throws
 
     %% Changes to interest rates trigger applyInterest() inside Bank.
     %% Admin is one built-in read-only supervisor; bank staff set bank-specific rates.
     %% FileStorage uses banks.txt, customers.txt, accounts.txt, admins.txt, bank_staff.txt.
-
     %% Admin menu can approve/reject PENDING banks or deactivate APPROVED banks.
-    %% The Bank status is persisted by FileStorage in banks.txt.
+    %% Bank status is persisted by FileStorage in banks.txt.
 
 ```
