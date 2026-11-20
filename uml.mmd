@@ -14,6 +14,9 @@ classDiagram
         +registerBankAndStaff(...) BankStaff*
         +save() void
         +run() void
+        +getStaffMembers() vector
+        +getBanks() vector
+        +getCustomers() vector
     }
     class Bank {
         -string bankId
@@ -23,6 +26,7 @@ classDiagram
         -string address
         -double defaultInterestRate
         -double defaultTransactionFee
+        -string status
         -vector~Customer*~ customers
         +openSavingsAccount(Customer*, balance, minimum) string
         +openCheckingAccount(Customer*, balance, limit) string
@@ -31,6 +35,9 @@ classDiagram
         +viewAllCustomers() void
         +updateAllInterestRates(rate) void
         +updateAllTransactionFees(fee) void
+        +getStatus() string
+        +setStatus(status) void
+        +isActive() bool
     }
     class Customer {
         -string customerId
@@ -110,15 +117,9 @@ classDiagram
     BankingException <|-- AccountNotFoundException
     FileStorage ..> BankSystem : saves / loads
 
-    %% Exception dependencies in the updated system
-    Account ..> InvalidAmountException : may throw
-    SavingsAccount ..> InvalidAmountException : may throw
-    SavingsAccount ..> InsufficientFundsException : may throw
-    CheckingAccount ..> InvalidAmountException : may throw
-    CheckingAccount ..> InsufficientFundsException : may throw
-    Customer ..> AccountNotFoundException : may throw
-    Bank ..> InvalidAmountException : may throw
-    Bank ..> AccountNotFoundException : may throw
-    Bank ..> BankingException : may throw
-    BankSystem ..> BankingException : may throw
-    FileStorage ..> BankingException : may throw
+    %% Changes to interest rates trigger applyInterest() inside Bank.
+    %% Admin is one built-in read-only supervisor; bank staff set bank-specific rates.
+    %% FileStorage uses banks.txt, customers.txt, accounts.txt, admins.txt, bank_staff.txt.
+
+    %% Admin menu can approve/reject PENDING banks or deactivate APPROVED banks.
+    %% The Bank status is persisted by FileStorage in banks.txt.
