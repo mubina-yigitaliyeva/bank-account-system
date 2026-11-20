@@ -104,7 +104,7 @@ classDiagram
         +save(system, filePath)$ void
         +load(system, filePath)$ void
     }
-    class std::runtime_error
+    class runtime_error["std::runtime_error"]
     class BankingException
     class InvalidAmountException
     class InsufficientFundsException
@@ -120,7 +120,7 @@ classDiagram
     BankStaff "0..*" --> "1" Bank : works at
     Account <|-- SavingsAccount
     Account <|-- CheckingAccount
-    BankingException <|-- std::runtime_error
+    runtime_error <|-- BankingException
     BankingException <|-- InvalidAmountException
     BankingException <|-- InsufficientFundsException
     BankingException <|-- AccountNotFoundException
