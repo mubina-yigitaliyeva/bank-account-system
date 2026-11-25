@@ -2,6 +2,10 @@
 
 A C++17 console-based banking system developed for an Object-Oriented Programming II project. It supports multiple banks, three user roles, and savings and checking accounts.
 
+## UML Class Diagram
+
+![Bank Account System UML](docs/Bank-Account-System-UML-Diagram.png)
+
 ## Features
 
 - **Customer:** Register once, log in, choose an approved bank, open savings/checking accounts, view accounts, deposit, and withdraw.
