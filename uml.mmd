@@ -1,5 +1,6 @@
 classDiagram
     direction TB
+
     class User {
         <<abstract>>
         #string userId
@@ -9,13 +10,18 @@ classDiagram
         #string password
         +getUserId() string
         +getFullName() string
+        +getPhoneNumber() string
         +getEmail() string
+        +getPassword() string
         +verifyPassword(pwd) bool
         +getRole()* string
         +displayProfile()* void
     }
+
     class Customer {
         -vector~Account*~ accounts
+        +getCustomerId() string
+        +getAccounts() vector
         +getRole() string
         +displayProfile() void
         +addAccount(account) void
@@ -24,19 +30,22 @@ classDiagram
         +listAccounts(bankId) void
         +getTotalBalance(bankId) double
     }
+
     class BankStaff {
         -string bankId
-        +getRole() string
-        +displayProfile() void
         +getStaffId() string
         +getBankId() string
-    }
-    class Admin {
         +getRole() string
         +displayProfile() void
+    }
+
+    class Admin {
         +getAdminName() string
+        +getRole() string
+        +displayProfile() void
         +showBanks(banks) void
     }
+
     class AuthenticationSystem {
         +registerCustomer(system, name, phone, email, password)$ Customer*
         +registerBankAndStaff(system, bankDetails, staffDetails)$ BankStaff*
@@ -44,6 +53,7 @@ classDiagram
         +loginStaff(system, contact, password)$ BankStaff*
         +loginAdmin(system, username, password)$ Admin*
     }
+
     class BankSystem {
         -vector~Bank*~ banks
         -vector~Customer*~ customers
@@ -52,6 +62,8 @@ classDiagram
         -int nextCustomerId
         -int nextBankId
         -int nextStaffId
+        +BankSystem()
+        +~BankSystem()
         +findBank(id) Bank*
         +findBankByName(name) Bank*
         +findCustomer(id) Customer*
@@ -63,22 +75,36 @@ classDiagram
         +save() void
         +run() void
     }
+
     class Bank {
         -string bankId
         -string bankName
+        -string phoneNumber
+        -string email
+        -string address
         -string status
         -double defaultInterestRate
         -double defaultTransactionFee
+        -long nextAccountNumber
         -vector~Customer*~ customers
         +openSavingsAccount(customer, balance, minimum) string
         +openCheckingAccount(customer, balance, limit) string
         +openAccount(customer, account) void
+        +findCustomer(customerId) Customer*
         +findAccount(number) Account*
+        +deposit(accountNumber, amount) void
+        +withdraw(accountNumber, amount) void
         +closeAccount(number) void
+        +viewAllCustomers() void
         +updateAllInterestRates(rate) void
         +updateAllTransactionFees(fee) void
+        +getBankId() string
+        +getBankName() string
+        +getStatus() string
+        +setStatus(status) void
         +isActive() bool
     }
+
     class Account {
         <<abstract>>
         -string accountNumber
@@ -86,10 +112,13 @@ classDiagram
         #double balance
         +deposit(amount) void
         +withdraw(amount)* void
+        +getAccountNumber() string
         +getBalance() double
+        +getBankId() string
         +getType()* string
         +display()* void
     }
+
     class SavingsAccount {
         -double interestRate
         -double minimumBalance
@@ -98,6 +127,7 @@ classDiagram
         +getType() string
         +display() void
     }
+
     class CheckingAccount {
         -double overdraftLimit
         -double transactionFee
@@ -105,16 +135,19 @@ classDiagram
         +getType() string
         +display() void
     }
+
     class FileStorage {
         +save(system)$ void
         +load(system)$ void
     }
+
     class runtime_error
     class BankingException
     class InvalidAmountException
     class InsufficientFundsException
     class AccountNotFoundException
 
+    %% Inheritance
     User <|-- Customer
     User <|-- BankStaff
     User <|-- Admin
@@ -125,18 +158,23 @@ classDiagram
     BankingException <|-- InsufficientFundsException
     BankingException <|-- AccountNotFoundException
 
+    %% Ownership and associations
     BankSystem "1" *-- "1..*" Bank : owns
     BankSystem "1" *-- "0..*" Customer : owns
     BankSystem "1" *-- "0..*" BankStaff : owns
     BankSystem "1" *-- "1" Admin : contains
-    Bank "0..*" -- "0..*" Customer : non-owning pointers
+    Bank "0..*" -- "0..*" Customer : references
     Customer "1" *-- "0..*" Account : owns
     BankStaff "0..*" --> "1" Bank : bankId
     Account "0..*" --> "1" Bank : bankId
+
+    %% Service dependencies
     AuthenticationSystem ..> BankSystem : registers through
-    AuthenticationSystem ..> User : verifies identity
-    BankSystem ..> AuthenticationSystem : delegates registration/login
-    FileStorage ..> BankSystem : saves / loads
+    AuthenticationSystem ..> User : authenticates
+    BankSystem ..> AuthenticationSystem : delegates login
+    FileStorage ..> BankSystem : saves and loads
+
+    %% Exception dependencies
     Account ..> InvalidAmountException : throws
     SavingsAccount ..> InsufficientFundsException : throws
     CheckingAccount ..> InsufficientFundsException : throws
@@ -144,5 +182,6 @@ classDiagram
     Bank ..> BankingException : throws
     FileStorage ..> BankingException : throws
 
-%% CLI menu functions live in src/Menus.cpp, not in the BankSystem class.
-%% BankSystem::run() calls runMainMenu(*this) from Menus.cpp.
+    %% CLI functions are in src/Menus.cpp, not a Menus class.
+    %% BankSystem::run() calls runMainMenu(*this).
+    %% runtime_error in this diagram represents std::runtime_error.
