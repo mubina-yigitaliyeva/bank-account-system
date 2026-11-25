@@ -1,57 +1,83 @@
 classDiagram
     direction TB
-
+    class User {
+        <<abstract>>
+        #string userId
+        #string fullName
+        #string phoneNumber
+        #string email
+        #string password
+        +getUserId() string
+        +getFullName() string
+        +getEmail() string
+        +verifyPassword(pwd) bool
+        +getRole()* string
+        +displayProfile()* void
+    }
+    class Customer {
+        -vector~Account*~ accounts
+        +getRole() string
+        +displayProfile() void
+        +addAccount(account) void
+        +removeAccount(number) void
+        +findAccount(number) Account*
+        +listAccounts(bankId) void
+        +getTotalBalance(bankId) double
+    }
+    class BankStaff {
+        -string bankId
+        +getRole() string
+        +displayProfile() void
+        +getStaffId() string
+        +getBankId() string
+    }
+    class Admin {
+        +getRole() string
+        +displayProfile() void
+        +getAdminName() string
+        +showBanks(banks) void
+    }
+    class AuthenticationSystem {
+        +registerCustomer(system, name, phone, email, password)$ Customer*
+        +registerBankAndStaff(system, bankDetails, staffDetails)$ BankStaff*
+        +loginCustomer(system, contact, password)$ Customer*
+        +loginStaff(system, contact, password)$ BankStaff*
+        +loginAdmin(system, username, password)$ Admin*
+    }
     class BankSystem {
         -vector~Bank*~ banks
         -vector~Customer*~ customers
         -vector~BankStaff*~ staffMembers
         -Admin admin
         -int nextCustomerId
-        +registerCustomer(name, phone, email, password) Customer*
-        +loginCustomer(contact, password) Customer*
+        -int nextBankId
+        -int nextStaffId
+        +findBank(id) Bank*
+        +findBankByName(name) Bank*
         +findCustomer(id) Customer*
-        +findBank(bankId) Bank*
-        +registerBankAndStaff(...) BankStaff*
-        +save() void
-        +run() void
-        +getStaffMembers() vector
         +getBanks() vector
         +getCustomers() vector
+        +getStaffMembers() vector
+        +getAdmin() Admin
+        +showBanks() void
+        +save() void
+        +run() void
     }
     class Bank {
         -string bankId
         -string bankName
-        -string phoneNumber
-        -string email
-        -string address
+        -string status
         -double defaultInterestRate
         -double defaultTransactionFee
-        -string status
         -vector~Customer*~ customers
-        +openSavingsAccount(Customer*, balance, minimum) string
-        +openCheckingAccount(Customer*, balance, limit) string
+        +openSavingsAccount(customer, balance, minimum) string
+        +openCheckingAccount(customer, balance, limit) string
+        +openAccount(customer, account) void
         +findAccount(number) Account*
         +closeAccount(number) void
-        +viewAllCustomers() void
         +updateAllInterestRates(rate) void
         +updateAllTransactionFees(fee) void
-        +getStatus() string
-        +setStatus(status) void
         +isActive() bool
-    }
-    class Customer {
-        -string customerId
-        -string fullName
-        -string phoneNumber
-        -string email
-        -string password
-        -vector~Account*~ accounts
-        +addAccount(Account*) void
-        +removeAccount(number) void
-        +findAccount(number) Account*
-        +listAccounts(bankId) void
-        +getTotalBalance(bankId) double
-        +verifyPassword(password) bool
     }
     class Account {
         <<abstract>>
@@ -61,7 +87,7 @@ classDiagram
         +deposit(amount) void
         +withdraw(amount)* void
         +getBalance() double
-        +getBankId() string
+        +getType()* string
         +display()* void
     }
     class SavingsAccount {
@@ -69,59 +95,54 @@ classDiagram
         -double minimumBalance
         +withdraw(amount) void
         +applyInterest() void
+        +getType() string
         +display() void
     }
     class CheckingAccount {
         -double overdraftLimit
         -double transactionFee
         +withdraw(amount) void
+        +getType() string
         +display() void
-    }
-    class Admin {
-        -string adminName
-        -string password
-        +login(name, password) bool
-        +showBanks(banks) void
-    }
-    class BankStaff {
-        -string staffId
-        -string bankId
-        -string fullName
-        -string phoneNumber
-        -string email
-        -string password
-        +verifyPassword(password) bool
-        +getBankId() string
     }
     class FileStorage {
         +save(system)$ void
         +load(system)$ void
     }
-    class std::runtime_error
+    class runtime_error
     class BankingException
     class InvalidAmountException
     class InsufficientFundsException
     class AccountNotFoundException
 
-    BankSystem "1" *-- "1..*" Bank : owns
-    BankSystem "1" *-- "0..*" Customer : registers once
-    BankSystem "1" *-- "0..*" BankStaff : owns
-    BankSystem "1" *-- "1" Admin : owns
-    Bank "0..*" -- "0..*" Customer : account holders
-    Customer "1" *-- "0..*" Account : owns
-    Account "0..*" --> "1" Bank : issued by
-    BankStaff "0..*" --> "1" Bank : works at
+    User <|-- Customer
+    User <|-- BankStaff
+    User <|-- Admin
     Account <|-- SavingsAccount
     Account <|-- CheckingAccount
-    BankingException <|-- std::runtime_error
+    runtime_error <|-- BankingException
     BankingException <|-- InvalidAmountException
     BankingException <|-- InsufficientFundsException
     BankingException <|-- AccountNotFoundException
+
+    BankSystem "1" *-- "1..*" Bank : owns
+    BankSystem "1" *-- "0..*" Customer : owns
+    BankSystem "1" *-- "0..*" BankStaff : owns
+    BankSystem "1" *-- "1" Admin : contains
+    Bank "0..*" -- "0..*" Customer : non-owning pointers
+    Customer "1" *-- "0..*" Account : owns
+    BankStaff "0..*" --> "1" Bank : bankId
+    Account "0..*" --> "1" Bank : bankId
+    AuthenticationSystem ..> BankSystem : registers through
+    AuthenticationSystem ..> User : verifies identity
+    BankSystem ..> AuthenticationSystem : delegates registration/login
     FileStorage ..> BankSystem : saves / loads
+    Account ..> InvalidAmountException : throws
+    SavingsAccount ..> InsufficientFundsException : throws
+    CheckingAccount ..> InsufficientFundsException : throws
+    Customer ..> AccountNotFoundException : throws
+    Bank ..> BankingException : throws
+    FileStorage ..> BankingException : throws
 
-    %% Changes to interest rates trigger applyInterest() inside Bank.
-    %% Admin is one built-in read-only supervisor; bank staff set bank-specific rates.
-    %% FileStorage uses banks.txt, customers.txt, accounts.txt, admins.txt, bank_staff.txt.
-
-    %% Admin menu can approve/reject PENDING banks or deactivate APPROVED banks.
-    %% The Bank status is persisted by FileStorage in banks.txt.
+%% CLI menu functions live in src/Menus.cpp, not in the BankSystem class.
+%% BankSystem::run() calls runMainMenu(*this) from Menus.cpp.

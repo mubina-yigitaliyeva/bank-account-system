@@ -1,136 +1,78 @@
-# DEU Bank — C++ Bank Account Manager
+# DEU Bank System
 
-OOP II final project. A command-line banking system with savings and checking accounts.
+A C++17 console-based banking system developed for an Object-Oriented Programming II project. It supports multiple banks, three user roles, and savings and checking accounts.
 
-## UML Class Diagram
+## Features
 
-```mermaid
-classDiagram
-    direction TB
+- **Customer:** Register once, log in, choose an approved bank, open savings/checking accounts, view accounts, deposit, and withdraw.
+- **Bank Staff:** Register a bank and staff account, then manage customers and bank settings after admin approval. Staff can change interest rates and transaction fees and close eligible zero-balance accounts.
+- **Admin:** View banks, customers, and staff; approve or reject bank registrations; review system statistics; and deactivate banks.
+- **Accounts:** Savings accounts enforce a minimum balance. Checking accounts support overdrafts and transaction fees.
+- **Persistence:** Banking data is saved to and loaded from text files.
 
-    class BankSystem {
-        -vector~Bank*~ banks
-        -vector~Customer*~ customers
-        -vector~BankStaff*~ staffMembers
-        -Admin admin
-        -int nextCustomerId
-        +registerCustomer(name, phone, email, password) Customer*
-        +loginCustomer(contact, password) Customer*
-        +findCustomer(id) Customer*
-        +findBank(bankId) Bank*
-        +registerBankAndStaff(...) BankStaff*
-        +save() void
-        +run() void
-        +getStaffMembers() vector
-        +getBanks() vector
-        +getCustomers() vector
-    }
-    class Bank {
-        -string bankId
-        -string bankName
-        -string phoneNumber
-        -string email
-        -string address
-        -double defaultInterestRate
-        -double defaultTransactionFee
-        -string status
-        -vector~Customer*~ customers
-        +openSavingsAccount(Customer*, balance, minimum) string
-        +openCheckingAccount(Customer*, balance, limit) string
-        +findAccount(number) Account*
-        +closeAccount(number) void
-        +viewAllCustomers() void
-        +updateAllInterestRates(rate) void
-        +updateAllTransactionFees(fee) void
-        +getStatus() string
-        +setStatus(status) void
-        +isActive() bool
-    }
-    class Customer {
-        -string customerId
-        -string fullName
-        -string phoneNumber
-        -string email
-        -string password
-        -vector~Account*~ accounts
-        +addAccount(Account*) void
-        +removeAccount(number) void
-        +findAccount(number) Account*
-        +listAccounts(bankId) void
-        +getTotalBalance(bankId) double
-        +verifyPassword(password) bool
-    }
-    class Account {
-        <<abstract>>
-        -string accountNumber
-        -string bankId
-        #double balance
-        +deposit(amount) void
-        +withdraw(amount)* void
-        +getBalance() double
-        +getBankId() string
-        +display()* void
-    }
-    class SavingsAccount {
-        -double interestRate
-        -double minimumBalance
-        +withdraw(amount) void
-        +applyInterest() void
-        +display() void
-    }
-    class CheckingAccount {
-        -double overdraftLimit
-        -double transactionFee
-        +withdraw(amount) void
-        +display() void
-    }
-    class Admin {
-        -string adminName
-        -string password
-        +login(name, password) bool
-        +showBanks(banks) void
-    }
-    class BankStaff {
-        -string staffId
-        -string bankId
-        -string fullName
-        -string phoneNumber
-        -string email
-        -string password
-        +verifyPassword(password) bool
-        +getBankId() string
-    }
-    class FileStorage {
-        +save(system)$ void
-        +load(system)$ void
-    }
-    class runtime_error["std::runtime_error"]
-    class BankingException
-    class InvalidAmountException
-    class InsufficientFundsException
-    class AccountNotFoundException
+New banks start with **PENDING** status. Customers can hold accounts at multiple approved banks without registering again.
 
-    BankSystem "1" *-- "1..*" Bank : owns
-    BankSystem "1" *-- "0..*" Customer : registers once
-    BankSystem "1" *-- "0..*" BankStaff : owns
-    BankSystem "1" *-- "1" Admin : owns
-    Bank "0..*" -- "0..*" Customer : account holders
-    Customer "1" *-- "0..*" Account : owns
-    Account "0..*" --> "1" Bank : issued by
-    BankStaff "0..*" --> "1" Bank : works at
-    Account <|-- SavingsAccount
-    Account <|-- CheckingAccount
-    runtime_error <|-- BankingException
-    BankingException <|-- InvalidAmountException
-    BankingException <|-- InsufficientFundsException
-    BankingException <|-- AccountNotFoundException
-    FileStorage ..> BankSystem : saves / loads
+## Project Structure
 
-    %% Changes to interest rates trigger applyInterest() inside Bank.
-    %% Admin is one built-in read-only supervisor; bank staff set bank-specific rates.
-    %% FileStorage uses banks.txt, customers.txt, accounts.txt, admins.txt, bank_staff.txt.
-
-    %% Admin menu can approve/reject PENDING banks or deactivate APPROVED banks.
-    %% The Bank status is persisted by FileStorage in banks.txt.
-
+```text
+include/    C++ class declarations (.h)
+src/        Implementations, menus, and main.cpp
+           User, AuthenticationSystem, Menus, BankSystem,
+           Bank, Customer, Account, FileStorage, and related classes
+data/       Saved text files (created/updated at runtime)
+docs/       UML diagrams and project documentation
+uml.mmd     Editable Mermaid class diagram
+README.md   Project overview
 ```
+
+## OOP Design
+
+- `User` is an abstract base class inherited by `Customer`, `BankStaff`, and `Admin`. Each role implements `getRole()` and `displayProfile()`.
+- `AuthenticationSystem` handles registration and login.
+- `BankSystem` owns and coordinates banks, customers, and staff.
+- `Bank` performs bank-specific account operations and keeps non-owning pointers to its customers.
+- `Customer` owns its account objects.
+- Abstract `Account` is inherited by `SavingsAccount` and `CheckingAccount`, which override virtual methods.
+- `Menus` contains the command-line menu functions; `FileStorage` handles saving and loading.
+- Custom exceptions handle invalid amounts, insufficient funds, and missing accounts.
+
+## Build and Run
+
+Requires a C++17 compiler. Run these commands from the project root:
+
+**macOS / Linux**
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Iinclude src/*.cpp -o bank_app
+./bank_app
+```
+
+**Windows (MinGW)**
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Iinclude src/*.cpp -o bank_app.exe
+./bank_app.exe
+```
+
+## Data Storage
+
+`FileStorage` uses five files in the `data/` folder:
+
+```text
+banks.txt
+customers.txt
+accounts.txt
+admins.txt
+bank_staff.txt
+```
+
+These files are generated from application data and should not be committed with real personal information or passwords. The editable class diagram is in `uml.mmd`.
+
+## Team Contributions
+
+- **Mubina:** User hierarchy, AuthenticationSystem, menu implementation, and system architecture.
+- **Mukhsinjon:** Account hierarchy, BankSystem, FileStorage, and system integration.
+- **Asror:** Account operations, savings/checking account concepts, and UML presentation.
+- **Mukhammad Ali:** Customer, Admin, and BankStaff class analysis, user roles, and UML presentation.
+
+> **Note:** This is a university demonstration project, not production banking software.
