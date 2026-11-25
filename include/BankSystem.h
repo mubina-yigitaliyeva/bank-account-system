@@ -12,10 +12,10 @@ using namespace std;
 class FileStorage;
 class AuthenticationSystem;
 
+// BankSystem owns customer profiles. Each customer may open accounts at different banks.
 class BankSystem {
     friend class FileStorage;
     friend class AuthenticationSystem;
-class AuthenticationSystem;
 private:
     vector<Bank*> banks;
     vector<Customer*> customers;
