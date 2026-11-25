@@ -1,15 +1,17 @@
 #include "BankStaff.h"
+#include <iostream>
 using namespace std;
 
 BankStaff::BankStaff(string id, string bank, string name,
                      string phone, string mail, string pwd)
-    : staffId(id), bankId(bank), fullName(name),
-      phoneNumber(phone), email(mail), password(pwd) {}
+    : User(id, name, phone, mail, pwd), bankId(bank) {}
 
-bool BankStaff::verifyPassword(string pwd) const { return password == pwd; }
-string BankStaff::getStaffId() const { return staffId; }
+string BankStaff::getRole() const { return "BankStaff"; }
+
+void BankStaff::displayProfile() const {
+    cout << "Bank staff: " << fullName << " (" << userId << ")\n";
+    cout << "Bank ID: " << bankId << " | Email: " << email << '\n';
+}
+
+string BankStaff::getStaffId() const { return getUserId(); }
 string BankStaff::getBankId() const { return bankId; }
-string BankStaff::getFullName() const { return fullName; }
-string BankStaff::getPhoneNumber() const { return phoneNumber; }
-string BankStaff::getEmail() const { return email; }
-string BankStaff::getPassword() const { return password; }
