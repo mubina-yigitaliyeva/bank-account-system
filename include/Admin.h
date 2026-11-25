@@ -1,21 +1,18 @@
 #ifndef BANK_ACCOUNT_MANAGER_ADMIN_H
 #define BANK_ACCOUNT_MANAGER_ADMIN_H
 
-#include <string>
+#include "User.h"
 #include <vector>
 using namespace std;
 
 class Bank;
 
-class Admin {
-    friend class FileStorage;
-private:
-    string adminName;
-    string password;
-
+class Admin : public User {
 public:
     Admin(string name, string pwd);
-    bool login(string name, string pwd) const;
+    string getRole() const override;
+    void displayProfile() const override;
+    string getAdminName() const;
     void showBanks(const vector<Bank*>& banks) const;
 };
 

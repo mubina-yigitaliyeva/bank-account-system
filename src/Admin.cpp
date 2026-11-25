@@ -5,10 +5,12 @@
 using namespace std;
 
 Admin::Admin(string name, string pwd)
-    : adminName(name), password(pwd) {}
+    : User("ADMIN", name, "", "", pwd) {}
 
-bool Admin::login(string name, string pwd) const {
-    return adminName == name && password == pwd;
+string Admin::getRole() const { return "Admin"; }
+string Admin::getAdminName() const { return getFullName(); }
+void Admin::displayProfile() const {
+    cout << "Administrator: " << fullName << '\n';
 }
 
 void Admin::showBanks(const vector<Bank*>& banks) const {
