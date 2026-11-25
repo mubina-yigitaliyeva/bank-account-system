@@ -4,7 +4,7 @@ A C++17 console-based banking system developed for an Object-Oriented Programmin
 
 ## UML Class Diagram
 
-![Bank Account System UML](docs/Bank-Account-System-UML-Diagram.png)
+![Bank Account System UML](docs/uml-diagram.png)
 
 ## Features
 
