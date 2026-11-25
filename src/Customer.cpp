@@ -8,11 +8,7 @@ using namespace std;
 
 Customer::Customer(string id, string name,
                    string phone, string mail, string pwd)
-    : customerId(id),
-      fullName(name),
-      phoneNumber(phone),
-      email(mail),
-      password(pwd) {}
+    : User(id, name, phone, mail, pwd) {}
 
 Customer::~Customer() {
     for (Account* account : accounts) {
@@ -70,28 +66,13 @@ double Customer::getTotalBalance(string bankId) const {
     return total;
 }
 
-string Customer::getCustomerId() const {
-    return customerId;
-}
+string Customer::getCustomerId() const { return getUserId(); }
 
-string Customer::getFullName() const {
-    return fullName;
-}
+string Customer::getRole() const { return "Customer"; }
 
-string Customer::getPhoneNumber() const {
-    return phoneNumber;
-}
-
-string Customer::getEmail() const {
-    return email;
-}
-
-string Customer::getPassword() const {
-    return password;
-}
-
-bool Customer::verifyPassword(string pwd) const {
-    return password == pwd;
+void Customer::displayProfile() const {
+    cout << "Customer: " << fullName << " (" << userId << ")\n";
+    cout << "Phone: " << phoneNumber << " | Email: " << email << '\n';
 }
 
 const vector<Account*>& Customer::getAccounts() const {
