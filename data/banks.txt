@@ -1,0 +1,2 @@
+BANK|B001|deu|01000000000|deu@example.com|Busan, South Korea|0.05|2|APPROVED
+BANK|B002|mubiBank|01012343434|mubibank@gmail.com|Busan|0.05|2|APPROVED

@@ -1,0 +1,1 @@
+CUSTOMER|1001|user|01023456789|user@gmail.com|1234
