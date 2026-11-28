@@ -160,6 +160,7 @@ void FileStorage::load(BankSystem& system) {
         if (!file->eof() && file->fail())
             throw BankingException("Could not read saved data file.");
     }
+    if (allData.find_first_not_of(" \t\r\n") == string::npos) return;
     istringstream in(allData);
 
     // Deleting the old data to store the new one from files.
